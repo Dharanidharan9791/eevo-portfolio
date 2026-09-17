@@ -225,16 +225,23 @@ export default function ComingSoon() {
                   href="mailto:hello@eevo.events?subject=Celebration%20Enquiry%20-%20eevo"
                   className="eevo-btn-primary"
                   id="email-enquiry-link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = 'mailto:hello@eevo.events?subject=Celebration%20Enquiry%20-%20eevo';
-                  }}
+                  title="Open in default mail client"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                   </svg>
-                  Email Us
+                  Email
+                </a>
+                <a
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@eevo.events&su=Celebration%20Enquiry%20-%20eevo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="eevo-btn-secondary"
+                  id="gmail-enquiry-link"
+                  title="Open directly in Gmail Web"
+                >
+                  Gmail
                 </a>
                 <button
                   type="button"
@@ -279,7 +286,7 @@ export default function ComingSoon() {
                   Call
                 </a>
                 <a
-                  href="https://wa.me/919445274264?text=Hi%20eevo%20team,%20I'd%20like%20to%20enquire%20about%20event%20curation"
+                  href="https://wa.me/919445274264?text=Hello%20team%20eevo,%20I'd%20love%20to%20enquire%20about%20planning%20an%20upcoming%20celebration."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="eevo-btn-secondary"
@@ -300,6 +307,54 @@ export default function ComingSoon() {
                   aria-label="Copy phone number"
                 >
                   {copiedType === 'phone' ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Instagram Contact Card */}
+            <div className="eevo-contact-item">
+              <div className="eevo-contact-meta">
+                <svg className="eevo-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                <span className="eevo-contact-label">Instagram / Lookbook</span>
+              </div>
+              <div className="eevo-contact-value">@eevo.events</div>
+              <div className="eevo-contact-actions">
+                <a
+                  href="https://www.instagram.com/eevo.events/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="eevo-btn-primary"
+                  id="instagram-profile-link"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                  Follow
+                </a>
+                <button
+                  type="button"
+                  className={`eevo-btn-copy ${copiedType === 'instagram' ? 'copied' : ''}`}
+                  onClick={() => handleCopy('https://www.instagram.com/eevo.events/', 'instagram', 'Instagram URL')}
+                  title="Copy Instagram link"
+                  id="copy-instagram-btn"
+                  aria-label="Copy Instagram link"
+                >
+                  {copiedType === 'instagram' ? (
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
@@ -493,6 +548,22 @@ export default function ComingSoon() {
       <footer className="eevo-footer">
         <div>
           © {new Date().getFullYear()} eevo. All rights reserved.
+        </div>
+        <div className="eevo-footer-social">
+          <a
+            href="https://www.instagram.com/eevo.events/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="eevo-footer-link"
+            aria-label="Follow eevo on Instagram"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+            <span>@eevo.events</span>
+          </a>
         </div>
         <div className="eevo-footer-tagline">
           YOUR CELEBRATION PARTNER.
