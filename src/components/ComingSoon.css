@@ -657,8 +657,41 @@
   gap: 0.5rem;
 }
 
-.eevo-modal-submit-btn:hover {
+.eevo-modal-submit-btn:hover:not(:disabled) {
   background-color: var(--forest-mid);
+}
+
+.eevo-modal-submit-btn:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.eevo-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(250, 247, 242, 0.3);
+  border-top-color: #FAF7F2;
+  border-radius: 50%;
+  animation: eevoSpin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes eevoSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.eevo-form-error-box {
+  margin-bottom: 0.9rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(197, 85, 85, 0.08);
+  border: 1px solid rgba(197, 85, 85, 0.25);
+  border-radius: 8px;
+  color: #A33A3A;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  text-align: left;
 }
 
 .eevo-success-message {

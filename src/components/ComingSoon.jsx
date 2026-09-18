@@ -7,6 +7,8 @@ export default function ComingSoon() {
   const [copiedType, setCopiedType] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -105,24 +107,69 @@ export default function ComingSoon() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setFormSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    // Format mailto link so user can immediately send the enquiry
-    const subject = encodeURIComponent(`Celebration Enquiry: ${formData.eventType} - ${formData.name}`);
-    const body = encodeURIComponent(
-      `Hi eevo Team,\n\nI would like to enquire about your curation services:\n\n` +
-      `Name: ${formData.name}\n` +
-      `Contact: ${formData.contact}\n` +
-      `Occasion: ${formData.eventType}\n` +
-      `Preferred Date/Season: ${formData.date || 'TBD'}\n` +
-      `Vision / Notes: ${formData.notes || 'N/A'}\n\n` +
-      `Looking forward to hearing from you!`
-    );
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 
-    // Open prefilled email in background or prompt
-    window.location.href = `mailto:hello@eevo.events?subject=${subject}&body=${body}`;
+    // Graceful fallback to mailto if access key is not yet configured in .env
+    if (!accessKey || accessKey === 'your_access_key_here') {
+      const subject = encodeURIComponent(`Celebration Enquiry: ${formData.eventType} - ${formData.name}`);
+      const body = encodeURIComponent(
+        `Hi eevo Team,\n\nI would like to enquire about your curation services:\n\n` +
+        `Name: ${formData.name}\n` +
+        `Contact: ${formData.contact}\n` +
+        `Occasion: ${formData.eventType}\n` +
+        `Preferred Date/Season: ${formData.date || 'TBD'}\n` +
+        `Vision / Notes: ${formData.notes || 'N/A'}\n\n` +
+        `Looking forward to hearing from you!`
+      );
+      window.location.href = `mailto:enquiry@eevo.events?subject=${subject}&body=${body}`;
+      setFormSubmitted(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const payload = {
+        access_key: accessKey,
+        subject: `Celebration Enquiry: ${formData.eventType} - ${formData.name}`,
+        from_name: 'eevo enquiry',
+        name: formData.name,
+        contact: formData.contact,
+        occasion: formData.eventType,
+        preferred_date: formData.date || 'TBD',
+        vision_notes: formData.notes || 'N/A',
+      };
+
+      if (formData.contact && formData.contact.includes('@')) {
+        payload.replyto = formData.contact.trim();
+      }
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFormSubmitted(true);
+      } else {
+        setSubmitError(result.message || 'Unable to transmit brief. Please reach us directly at enquiry@eevo.events.');
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+      setSubmitError('Network connection issue. Please contact enquiry@eevo.events or call 9445274264.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const pillars = [
@@ -219,10 +266,10 @@ export default function ComingSoon() {
                 </svg>
                 <span className="eevo-contact-label">Enquiry Email</span>
               </div>
-              <div className="eevo-contact-value">hello@eevo.events</div>
+              <div className="eevo-contact-value">enquiry@eevo.events</div>
               <div className="eevo-contact-actions">
                 <a
-                  href="mailto:hello@eevo.events?subject=Celebration%20Enquiry%20-%20eevo"
+                  href="mailto:enquiry@eevo.events?subject=Celebration%20Enquiry%20-%20eevo"
                   className="eevo-btn-primary"
                   id="email-enquiry-link"
                   title="Open in default mail client"
@@ -234,7 +281,7 @@ export default function ComingSoon() {
                   Email
                 </a>
                 <a
-                  href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@eevo.events&su=Celebration%20Enquiry%20-%20eevo"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=enquiry@eevo.events&su=Celebration%20Enquiry%20-%20eevo"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="eevo-btn-secondary"
@@ -246,7 +293,7 @@ export default function ComingSoon() {
                 <button
                   type="button"
                   className={`eevo-btn-copy ${copiedType === 'email' ? 'copied' : ''}`}
-                  onClick={() => handleCopy('hello@eevo.events', 'email', 'Email')}
+                  onClick={() => handleCopy('enquiry@eevo.events', 'email', 'Email')}
                   title="Copy email address"
                   id="copy-email-btn"
                   aria-label="Copy email address"
@@ -423,21 +470,34 @@ export default function ComingSoon() {
 
             {formSubmitted ? (
               <div className="eevo-success-message">
-                <h4>Thank You</h4>
+                <h4>Brief Received</h4>
                 <p>
-                  Your email client should have opened with your brief. Alternatively, you can reach us directly at <strong>hello@eevo.events</strong> or <strong>9445274264</strong>.
+                  Thank you! Your celebration brief has been transmitted directly to our curation team. We will review your vision and connect promptly. Alternatively, reach us directly at <strong>enquiry@eevo.events</strong> or <strong>9445274264</strong>.
                 </p>
                 <button
                   type="button"
                   className="eevo-modal-submit-btn"
                   style={{ marginTop: '1.2rem' }}
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setFormSubmitted(false);
+                    setSubmitError(null);
+                    setFormData({
+                      name: '',
+                      contact: '',
+                      eventType: 'Wedding',
+                      date: '',
+                      notes: '',
+                    });
+                  }}
                 >
                   Close
                 </button>
               </div>
             ) : (
               <form onSubmit={handleFormSubmit}>
+                {/* Anti-spam honeypot */}
+                <input type="checkbox" name="botcheck" style={{ display: 'none' }} tabIndex="-1" autoComplete="off" />
                 <div className="eevo-form-group">
                   <label className="eevo-form-label" htmlFor="client-name">
                     Your Name
@@ -521,12 +581,32 @@ export default function ComingSoon() {
                   />
                 </div>
 
-                <button type="submit" className="eevo-modal-submit-btn" id="submit-inquiry-btn">
-                  <span>Send Enquiry to Concierge</span>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
+                {submitError && (
+                  <div className="eevo-form-error-box" role="alert">
+                    {submitError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="eevo-modal-submit-btn"
+                  id="submit-inquiry-btn"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="eevo-spinner" aria-hidden="true"></span>
+                      <span>Transmitting Brief...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Send Enquiry to Concierge</span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                      </svg>
+                    </>
+                  )}
                 </button>
               </form>
             )}
